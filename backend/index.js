@@ -1,22 +1,45 @@
-const express = require('express')
+
+const express = require('express');
 const app = express();
-const PORT=5578
-const mongoose = require('mongoose');
+const PORT = 4578 //PORT
+const mongoose = require('mongoose'); //mongoose for DB
+const cors = require('cors'); // to remore cor issue
+app.use(cors())  // cor policy activation
+app.use(express.json()); // to render json req from frontend
+app.use(express.urlencoded({ extended: true })); // to render form data from frontend
 
-mongoose.connect("mongodb+srv://faihac5:5uX4cNMgxkqOHWOn@cluster0.go3ocu7.mongodb.net/").then(()=>{
-    console.log("mongoDB connected successfully")
-}).catch((err)=>{
-console.log("Error" + err)
-});
+//connect backend with DB
+mongoose.connect("mongodb+srv://faihac5:IKe0Hi0Z5nGR0YBD@cluster0.go3ocu7.mongodb.net/")//!insert your username
+    .then(() => { console.log("MongoDB connected successfully") })//*success message
+    .catch((err) => { console.log("Error connecting to MongoDB " + err) });//*fail message
 
-app.get('/',(req,res)=>{
-     res.send('server is hosting ')
+// CRUD operation 
+// C-Create - POST 
+//R-READ-GET
+//U-Update -PUT
+//D-Delete - DELETE
+
+
+const PRODUCT = require("./model/product")
+
+app.post('/addData',async (req, res) => {
+    try {
+
+        let item = req.body
+        console.log(item)
+
+
+        const saveData = await PRODUCT(item) //PRODUCT is a model. we cross check the form data with the model we created before saving it
+        await saveData.save()  // through this code we save the incoming data from front end to db 
+        res.send((saveData))
+
+
+    } catch (error) {
+        res.send(error);
+    }
 })
 
-app.get('/about',(req,res)=>{
 
-})
-
-app.listen(PORT,()=>{
-     console.log(`listening on port ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`listening on port ${PORT}`);
 });
